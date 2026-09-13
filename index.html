@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mors Asistanı</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #131c2e;
+            --primary-color: #38bdf8;
+            --primary-hover: #7dd3fc;
+            --text-color: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --accent-color: #f43f5e;
+            --inactive-part: #1e293b;
+            --success-color: #4ade80;
+        }
+
+        html.light {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --primary-color: #0284c7;
+            --primary-hover: #0369a1;
+            --text-color: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: #cbd5e1;
+            --accent-color: #e11d48;
+            --inactive-part: #e2e8f0;
+            --success-color: #16a34a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .top-bar {
+            width: 100%;
+            max-width: 850px;
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .theme-toggle-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.4rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 18px;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* Sekmeler */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            background-color: var(--border-color);
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-color);
+            border-color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: #ffffff;
+            border-color: transparent;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Animasyonlu Ders Alanı */
+        .animator-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 22px;
+        }
+
+        .slide-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 35px;
+            min-height: 250px;
+        }
+
+        .letter-display-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 250px;
+        }
+
+        .main-letter-title {
+            font-size: 4.5rem;
+            font-weight: bold;
+            color: var(--text-color);
+            line-height: 1;
+        }
+
+        .morse-shape-container {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            min-height: 45px;
+            flex-wrap: wrap;
+        }
+
+        .morse-block {
+            background-color: var(--inactive-part);
+            transition: all 0.25s ease;
+        }
+
+        .morse-block.dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+        }
+
+        .morse-block.dash {
+            width: 60px;
+            height: 24px;
+            border-radius: 12px;
+        }
+
+        .morse-block.active {
+            background-color: var(--accent-color);
+            box-shadow: 0 0 20px var(--accent-color);
+            transform: scale(1.12);
+        }
+
+        .slide-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .slide-morse {
+            font-size: 2.8rem;
+            letter-spacing: 6px;
+            color: var(--success-color);
+        }
+
+        .slide-mnemonic {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .animator-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .speed-control select {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        /* Çevirici Alanı */
+        textarea {
+            width: 100%;
+            height: 110px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-color);
+            padding: 15px;
+            font-size: 1.15rem;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        button.action-btn {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #ffffff;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        button.action-btn:hover {
+            opacity: 0.9;
+        }
+
+        .output-box {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            font-size: 1.4rem;
+            letter-spacing: 3px;
+            min-height: 70px;
+            word-break: break-all;
+            margin-top: 15px;
+            color: var(--success-color);
+        }
+
+        /* İnteraktif Telgraf Tuşu Alanı */
+        .telegraph-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            text-align: center;
+        }
+
+        .telegraph-btn {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary-color) 0%, #0284c7 100%);
+            border: 6px solid var(--border-color);
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+
+        .telegraph-btn:active {
+            transform: scale(0.93);
+            background: radial-gradient(circle, var(--accent-color) 0%, #be123c 100%);
+        }
+
+        .telegraph-output {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            width: 100%;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            min-height: 60px;
+            color: var(--primary-color);
+            text-align: left;
+            word-break: break-all;
+        }
+
+        /* Quiz Alanı */
+        .quiz-container {
+            text-align: center;
+        }
+
+        .quiz-mode-select {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            font-weight: bold;
+        }
+
+        .quiz-question {
+            font-size: 2.8rem;
+            font-weight: bold;
+            margin: 15px 0;
+            color: var(--primary-color);
+            letter-spacing: 4px;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .quiz-option-btn {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .quiz-option-btn:hover {
+            border-color: var(--primary-color);
+        }
+
+        .quiz-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .quiz-feedback {
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .quiz-feedback.correct {
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .quiz-feedback.wrong {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .quiz-score {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Alfabe Rehberi Tablosu */
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+            gap: 14px;
+            max-height: 420px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .alphabet-item {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .alphabet-item .char {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+        }
+
+        .alphabet-item .morse {
+            font-size: 1.1rem;
+            color: var(--success-color);
+            margin-top: 6px;
+            letter-spacing: 2px;
+        }
+
+        .alphabet-item .mnemonic {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <button class="theme-toggle-btn" onclick="toggleTheme()">🌙 / ☀️ Tema Değiştir</button>
+    </div>
+
+    <header>
+        <h1>Mors Asistanı</h1>
+        <p>Animasyonlu Ders, Telgraf Simülatörü, Quiz ve Çevirici</p>
+    </header>
+
+    <div class="container">
+        <!-- Sekme Butonları -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'video-learning-tab')">Animasyonlu Ders</button>
+            <button class="tab-btn" onclick="switchTab(event, 'translator-tab')">Çevirici & Ses</button>
+            <button class="tab-btn" onclick="switchTab(event, 'telegraph-tab')">Telgraf Tuşu</button>
+            <button class="tab-btn" onclick="switchTab(event, 'quiz-tab')">Quiz & Yarış</button>
+            <button class="tab-btn" onclick="switchTab(event, 'guide-tab')">Alfabe Rehberi</button>
+        </div>
+
+        <!-- 1. VİDEO TARZI ANİMASYONLU ÖĞRENME -->
+        <div id="video-learning-tab" class="tab-content active card">
+            <h2>Adım Adım Mors Alfabesi Eğitimi</h2>
+            <div class="animator-container">
+                <p>İpucu: Klavyedeki sağ/sol ok tuşlarıyla harfler arasında gezinebilirsin ⌨️</p>
+                
+                <div class="slide-display">
+                    <div class="letter-display-area">
+                        <div class="main-letter-title" id="mainLetterTitle">A</div>
+                        <div class="morse-shape-container" id="morseShapeContainer"></div>
+                    </div>
+
+                    <div class="slide-info">
+                        <div class="slide-morse" id="animMorse">.-</div>
+                        <div class="slide-mnemonic" id="animMnemonic">İpucu: A PART</div>
+                    </div>
+                </div>
+
+                <div class="animator-controls">
+                    <button class="action-btn" onclick="prevSlide()">Önceki (⬅)</button>
+                    <button class="action-btn" style="background: linear-gradient(135deg, #e11d48, #be123c);" onclick="playCurrentSlideSound()">Sesi Dinle 🔊</button>
+                    <button class="action-btn" onclick="nextSlide()">Sonraki (➡)</button>
+                    
+                    <div class="speed-control">
+                        <label for="speedSelect">Hız:</label>
+                        <select id="speedSelect">
+                            <option value="1.5">Yavaş</option>
+                            <option value="1" selected>Normal</option>
+                            <option value="0.7">Hızlı</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ÇEVİRİCİ SEKMESİ -->
+        <div id="translator-tab" class="tab-content card">
+            <h2>Metin / Mors Çevirici</h2>
+            <textarea id="inputText" placeholder="Buraya metin veya mors kodu yazın..." oninput="convertText()"></textarea>
+            
+            <div class="btn-group">
+                <button class="action-btn" onclick="playMorse()">Sesi Çal 🔊</button>
+                <button class="action-btn" style="background: linear-gradient(135deg, #475569, #334155);" onclick="clearFields()">Temizle</button>
+            </div>
+
+            <div class="output-box" id="outputText">Sonuç burada görünecek...</div>
+        </div>
+
+        <!-- 3. İNTERAKTİF TELGRAF TUŞU -->
+        <div id="telegraph-tab" class="tab-content card">
+            <h2>İnteraktif Telgraf Tuşu</h2>
+            <div class="telegraph-container">
+                <p>Kısa tıkla = nokta (.), basılı tut = çizgi (-). <b>Enter</b> ile boşluk bırakabilir, <b>Backspace</b> tuşu veya sil butonuyla son harfi silebilirsin!</p>
+                
+                <div class="telegraph-btn" id="telegraphBtn" 
+                     onmousedown="startPress()" onmouseup="endPress()" 
+                     onttouchstart="startPress()" ontouchend="endPress()">
+                    <span>📡</span>
+                    <span>TELSİZ TUŞU</span>
+                </div>
+
+                <div style="width: 100%;">
+                    <p style="margin-bottom: 5px; text-align: left; color: var(--text-secondary);">Anlık Yazılan Kod:</p>
+                    <div class="telegraph-output" id="teleCodeOutput"></div>
+                </div>
+
+                <div style="width: 100%;">
+                    <p style="margin-bottom: 5px; text-align: left; color: var(--text-secondary);">Oluşan Kelime / Metin:</p>
+                    <div class="telegraph-output" id="teleCharOutput" style="color: var(--success-color); font-weight: bold;"></div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="action-btn" onclick="addSpaceToTelegraph()">Boşluk (Enter)</button>
+                    <button class="action-btn" onclick="deleteLastChar()" style="background: linear-gradient(135deg, #e11d48, #be123c);">Harf Sil (←)</button>
+                    <button class="action-btn" onclick="clearTelegraph()" style="background: linear-gradient(135deg, #475569, #334155);">Hepsini Sıfırla</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. QUIZ & YARIŞ SEKMESİ -->
+        <div id="quiz-tab" class="tab-content card">
+            <h2>Mors Quiz ve Yarış Modu</h2>
+            <div class="quiz-container">
+                <div class="quiz-mode-select">
+                    <button class="action-btn" id="mode10Btn" onclick="setQuizMode('10questions')">Süresiz (10 Soru)</button>
+                    <button class="action-btn" id="modeTimedBtn" onclick="setQuizMode('timed')" style="background: linear-gradient(135deg, #e11d48, #be123c);">Süreli Yarış (30s)</button>
+                </div>
+
+                <div class="quiz-header-bar">
+                    <span id="quizInfoLabel">Mod: Süresiz (Soru: 1/10)</span>
+                    <button class="action-btn" id="restartQuizBtn" onclick="restartQuiz()" style="padding: 6px 14px; font-size: 0.85rem; display:none;">Yeniden Başlat 🔄</button>
+                </div>
+
+                <p>Bu Mors kodunun karşılığı hangi harftir?</p>
+                <div class="quiz-question" id="quizQuestion">- - -</div>
+                <div class="quiz-options" id="quizOptions"></div>
+                
+                <div class="quiz-footer">
+                    <div id="quizFeedback" class="quiz-feedback">Cevabını bekliyorum...</div>
+                    <div class="quiz-score" id="quizScore">Doğru: 0 | Yanlış: 0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. ALFABE REHBERİ SEKMESİ -->
+        <div id="guide-tab" class="tab-content card">
+            <h2>Mors Alfabesi Tablosu ve İpuçları</h2>
+            <div class="alphabet-grid" id="alphabetGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        const morseData = [
+            { char: 'A', morse: '.-', mnemonic: 'A PART' },
+            { char: 'B', morse: '-...', mnemonic: 'BOB is the man' },
+            { char: 'C', morse: '-.-.', mnemonic: 'CO CA CO LA' },
+            { char: 'Ç', morse: '-.-..', mnemonic: '' },
+            { char: 'D', morse: '-..', mnemonic: 'DOG did it' },
+            { char: 'E', morse: '.', mnemonic: 'EH' },
+            { char: 'F', morse: '..-.', mnemonic: 'for the FUUU-ture!' },
+            { char: 'G', morse: '--.', mnemonic: 'GOOD GOD tom!' },
+            { char: 'Ğ', morse: '--..-', mnemonic: '' },
+            { char: 'H', morse: '....', mnemonic: 'he-li-cop-ter' },
+            { char: 'I', morse: '..', mnemonic: 'I eat' },
+            { char: 'İ', morse: '..', mnemonic: 'I eat' },
+            { char: 'J', morse: '.---', mnemonic: 'tom JOINS JOLLY JERRY' },
+            { char: 'K', morse: '-.-', mnemonic: 'KAN-ga-ROO' },
+            { char: 'L', morse: '.-..', mnemonic: 'lo-BOOO-to-my' },
+            { char: 'M', morse: '--', mnemonic: 'MMMM MMMX' },
+            { char: 'N', morse: '-.', mnemonic: 'NA-vy' },
+            { char: 'O', morse: '---', mnemonic: 'OHH MYY GODD' },
+            { char: 'Ö', morse: '---.', mnemonic: '' },
+            { char: 'P', morse: '.--.', mnemonic: 'the PINO-CCHIO’s lie' },
+            { char: 'R', morse: '.-.', mnemonic: 'ro-TAAA-tion' },
+            { char: 'S', morse: '...', mnemonic: 'stop! stop! stop!' },
+            { char: 'Ş', morse: '----', mnemonic: '' },
+            { char: 'T', morse: '-', mnemonic: 'TALL' },
+            { char: 'U', morse: '..-', mnemonic: 'un-der-GROUND' },
+            { char: 'Ü', morse: '..--', mnemonic: '' },
+            { char: 'V', morse: '...-', mnemonic: 'vic-to-ry VEEE' },
+            { char: 'Y', morse: '-.--', mnemonic: 'YOU’RE a COOL DUDE' },
+            { char: 'Z', morse: '--..', mnemonic: 'ZOO-MOR-phi-sm' }
+        ];
+
+        const morseMap = {};
+        const reverseMorseMap = {};
+        morseData.forEach(item => {
+            morseMap[item.char] = item.morse;
+            if(!reverseMorseMap[item.morse]) {
+                reverseMorseMap[item.morse] = item.char;
+            }
+        });
+        morseMap[' '] = '/';
+        reverseMorseMap['/'] = ' ';
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                html.classList.add('light');
+            } else {
+                html.classList.remove('light');
+                html.classList.add('dark');
+            }
+        }
+
+        function switchTab(evt, tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            evt.currentTarget.classList.add('active');
+
+            if (tabId === 'quiz-tab') {
+                restartQuiz();
+            }
+        }
+
+        let currentSlideIndex = 0;
+        function updateSlide() {
+            const item = morseData[currentSlideIndex];
+            document.getElementById('mainLetterTitle').innerText = item.char;
+            document.getElementById('animMorse').innerText = item.morse;
+            document.getElementById('animMnemonic').innerText = item.mnemonic ? "İpucu: " + item.mnemonic : "";
+
+            const container = document.getElementById('morseShapeContainer');
+            container.innerHTML = '';
+
+            for (let i = 0; i < item.morse.length; i++) {
+                const block = document.createElement('div');
+                block.className = 'morse-block ' + (item.morse[i] === '.' ? 'dot' : 'dash');
+                block.id = 'morse-block-' + i;
+                container.appendChild(block);
+            }
+        }
+
+        function nextSlide() {
+            currentSlideIndex = (currentSlideIndex + 1) % morseData.length;
+            updateSlide();
+            playCurrentSlideSound();
+        }
+
+        function prevSlide() {
+            currentSlideIndex = (currentSlideIndex - 1 + morseData.length) % morseData.length;
+            updateSlide();
+            playCurrentSlideSound();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('video-learning-tab').classList.contains('active')) {
+                if (e.key === 'ArrowRight') nextSlide();
+                if (e.key === 'ArrowLeft') prevSlide();
+            }
+        });
+
+        async function playCurrentSlideSound() {
+            const item = morseData[currentSlideIndex];
+            const speedMultiplier = parseFloat(document.getElementById('speedSelect').value);
+
+            for (let i = 0; i < item.morse.length; i++) {
+                const b = document.getElementById('morse-block-' + i);
+                if (b) b.classList.remove('active');
+            }
+
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+            let startTime = audioCtx.currentTime + 0.05;
+            const dotDuration = 0.08 * speedMultiplier; 
+            const dashDuration = dotDuration * 3;
+            const pauseDuration = dotDuration;
+
+            for (let i = 0; i < item.morse.length; i++) {
+                const char = item.morse[i];
+                const blockEl = document.getElementById('morse-block-' + i);
+
+                if (char === '.') {
+                    playTone(audioCtx, 600, startTime, dotDuration);
+                    setTimeout((el) => { if(el) el.classList.add('active'); }, (startTime - audioCtx.currentTime) * 1000, blockEl);
+                    startTime += dotDuration + pauseDuration;
+                } else if (char === '-') {
+                    playTone(audioCtx, 600, startTime, dashDuration);
+                    setTimeout((el) => { if(el) el.classList.add('active'); }, (startTime - audioCtx.currentTime) * 1000, blockEl);
+                    startTime += dashDuration + pauseDuration;
+                }
+            }
+        }
+
+        function playTone(audioCtx, freq, time, duration) {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.value = freq;
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start(time);
+            oscillator.stop(time + duration);
+        }
+
+        function convertText() {
+            const input = document.getElementById('inputText').value.trim();
+            const outputBox = document.getElementById('outputText');
+            if (!input) { outputBox.innerText = "Sonuç burada görünecek..."; return; }
+
+            if (input.includes('.') || input.includes('-') && !/[a-zA-ZçÇğĞıİöÖşŞüÜ]/.test(input)) {
+                const words = input.split('/');
+                let decoded = '';
+                for (let word of words) {
+                    const letters = word.trim().split(' ');
+                    for (let letter of letters) {
+                        if (reverseMorseMap[letter]) decoded += reverseMorseMap[letter];
+                        else if (letter !== '') decoded += '?';
+                    }
+                    decoded += ' ';
+                }
+                outputBox.innerText = decoded.trim();
+            } else {
+                const upperInput = input.toUpperCase();
+                let encoded = '';
+                for (let i = 0; i < upperInput.length; i++) {
+                    const char = upperInput[i];
+                    if (morseMap[char]) encoded += morseMap[char] + ' ';
+                    else encoded += char + ' ';
+                }
+                outputBox.innerText = encoded.trim();
+            }
+        }
+
+        function clearFields() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').innerText = "Sonuç burada görünecek...";
+        }
+
+        async function playMorse() {
+            let inputVal = document.getElementById('inputText').value.trim();
+            let textToPlay = "";
+            if (!inputVal) return;
+
+            if (!inputVal.includes('.') && !inputVal.includes('-')) {
+                const upperInput = inputVal.toUpperCase();
+                for (let i = 0; i < upperInput.length; i++) {
+                    if (morseMap[upperInput[i]]) textToPlay += morseMap[upperInput[i]] + ' ';
+                }
+            } else { textToPlay = inputVal; }
+
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+            let startTime = audioCtx.currentTime + 0.05;
+            const dotDuration = 0.08; 
+            const dashDuration = dotDuration * 3;
+            const pauseDuration = dotDuration;
+
+            for (let i = 0; i < textToPlay.length; i++) {
+                const char = textToPlay[i];
+                if (char === '.') { playTone(audioCtx, 600, startTime, dotDuration); startTime += dotDuration + pauseDuration; }
+                else if (char === '-') { playTone(audioCtx, 600, startTime, dashDuration); startTime += dashDuration + pauseDuration; }
+                else if (char === ' ' || char === '/') { startTime += dotDuration * 3; }
+            }
+        }
+
+        let pressStartTime = 0;
+        let currentTeleCode = "";
+        let fullTeleSentence = "";
+        let teleTimeout = null;
+
+        function startPress() {
+            pressStartTime = new Date().getTime();
+            playToneStart();
+        }
+
+        function endPress() {
+            const pressDuration = new Date().getTime() - pressStartTime;
+            stopTone();
+
+            if (pressDuration < 250) {
+                currentTeleCode += ".";
+            } else {
+                currentTeleCode += "-";
+            }
+
+            document.getElementById('teleCodeOutput').innerText = currentTeleCode;
+            
+            clearTimeout(teleTimeout);
+            teleTimeout = setTimeout(() => {
+                commitLetter();
+            }, 1800);
+        }
+
+        function commitLetter() {
+            if (currentTeleCode.length > 0) {
+                if (reverseMorseMap[currentTeleCode]) {
+                    fullTeleSentence += reverseMorseMap[currentTeleCode];
+                } else {
+                    fullTeleSentence += "?";
+                }
+                currentTeleCode = "";
+                document.getElementById('teleCodeOutput').innerText = "";
+                document.getElementById('teleCharOutput').innerText = fullTeleSentence;
+            }
+        }
+
+        function addSpaceToTelegraph() {
+            commitLetter();
+            fullTeleSentence += " ";
+            document.getElementById('teleCharOutput').innerText = fullTeleSentence;
+        }
+
+        function deleteLastChar() {
+            if (currentTeleCode.length > 0) {
+                currentTeleCode = currentTeleCode.slice(0, -1);
+                document.getElementById('teleCodeOutput').innerText = currentTeleCode;
+            } else if (fullTeleSentence.length > 0) {
+                fullTeleSentence = fullTeleSentence.slice(0, -1);
+                document.getElementById('teleCharOutput').innerText = fullTeleSentence;
+            }
+        }
+
+        let teleOscillator = null;
+        let teleGain = null;
+        async function playToneStart() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
+            teleOscillator = audioCtx.createOscillator();
+            teleGain = audioCtx.createGain();
+            teleOscillator.type = 'sine';
+            teleOscillator.frequency.value = 600;
+            teleOscillator.connect(teleGain);
+            teleGain.connect(audioCtx.destination);
+            teleOscillator.start();
+        }
+        function stopTone() {
+            if (teleOscillator) {
+                try { teleOscillator.stop(); } catch(e){}
+                teleOscillator = null;
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('telegraph-tab').classList.contains('active')) {
+                if (e.code === 'Space') {
+                    if (!e.repeat) startPress();
+                    e.preventDefault();
+                } else if (e.code === 'Enter') {
+                    addSpaceToTelegraph();
+                    e.preventDefault();
+                } else if (e.code === 'Backspace') {
+                    deleteLastChar();
+                    e.preventDefault();
+                }
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            if (e.code === 'Space' && document.getElementById('telegraph-tab').classList.contains('active')) {
+                endPress();
+                e.preventDefault();
+            }
+        });
+
+        function clearTelegraph() {
+            currentTeleCode = "";
+            fullTeleSentence = "";
+            document.getElementById('teleCodeOutput').innerText = "";
+            document.getElementById('teleCharOutput').innerText = "";
+        }
+
+        // Quiz / Yarış Mantığı
+        let quizMode = '10questions'; // '10questions' veya 'timed'
+        let scoreCorrect = 0;
+        let scoreWrong = 0;
+        let currentCorrectChar = '';
+        let quizPool = [];
+        let questionCount = 0;
+        const maxQuestions = 10;
+        let timeLeft = 30;
+        let timerInterval = null;
+        let isQuizActive = false;
+
+        function setQuizMode(mode) {
+            quizMode = mode;
+            restartQuiz();
+        }
+
+        function restartQuiz() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            scoreCorrect = 0;
+            scoreWrong = 0;
+            questionCount = 0;
+            isQuizActive = true;
+            timeLeft = 30;
+
+            document.getElementById('restartQuizBtn').style.display = 'inline-block';
+            document.getElementById('quizScore').innerText = `Doğru: 0 | Yanlış: 0`;
+            
+            const feedbackBox = document.getElementById('quizFeedback');
+            feedbackBox.className = "quiz-feedback";
+            feedbackBox.innerText = "Cevabını bekliyorum...";
+
+            initQuizPool();
+            nextQuizQuestion();
+        }
+
+        function initQuizPool() {
+            quizPool = [...morseData];
+            quizPool.sort(() => Math.random() - 0.5);
+        }
+
+        function nextQuizQuestion() {
+            if (!isQuizActive) return;
+
+            const feedbackBox = document.getElementById('quizFeedback');
+            feedbackBox.className = "quiz-feedback";
+            feedbackBox.innerText = "Cevabını bekliyorum...";
+
+            if (quizMode === '10questions') {
+                if (questionCount >= maxQuestions) {
+                    isQuizActive = false;
+                    document.getElementById('quizQuestion').innerText = "🎉 Bitti!";
+                    feedbackBox.innerText = `Test tamamlandı! Toplam Doğru: ${scoreCorrect}, Yanlış: ${scoreWrong}`;
+                    document.getElementById('quizOptions').innerHTML = '<p style="grid-column: span 2; font-size:1.2rem; color:var(--primary-color);">Tebrikler! Yeniden başlatmak için üstteki butona basabilirsin.</p>';
+                    document.getElementById('quizInfoLabel').innerText = `Mod: Süresiz (Tamamlandı)`;
+                    return;
+                }
+                questionCount++;
+                document.getElementById('quizInfoLabel').innerText = `Mod: Süresiz (Soru: ${questionCount}/${maxQuestions})`;
+            } else {
+                document.getElementById('quizInfoLabel').innerText = `Süre: ${timeLeft}s | Süreli Yarış`;
+                if (!timerInterval) {
+                    timerInterval = setInterval(() => {
+                        timeLeft--;
+                        document.getElementById('quizInfoLabel').innerText = `Süre: ${timeLeft}s | Süreli Yarış`;
+                        if (timeLeft <= 0) {
+                            clearInterval(timerInterval);
+                            isQuizActive = false;
+                            document.getElementById('quizQuestion').innerText = "⏰ Süre Bitti!";
+                            feedbackBox.innerText = `Süre doldu! Toplam Doğru: ${scoreCorrect}`;
+                            document.getElementById('quizOptions').innerHTML = '<p style="grid-column: span 2; font-size:1.2rem; color:var(--primary-color);">Süre bitti! Yeniden oynamak için üstteki butona bas.</p>';
+                        }
+                    }, 1000);
+                }
+            }
+
+            if (quizPool.length === 0) initQuizPool();
+            const randomItem = quizPool.pop();
+            currentCorrectChar = randomItem.char;
+            document.getElementById('quizQuestion').innerText = randomItem.morse;
+
+            let options = [randomItem.char];
+            while (options.length < 4) {
+                const wrongItem = morseData[Math.floor(Math.random() * morseData.length)];
+                if (!options.includes(wrongItem.char)) options.push(wrongItem.char);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkQuizAnswer(opt);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkQuizAnswer(selected) {
+            if (!isQuizActive) return;
+            const feedbackBox = document.getElementById('quizFeedback');
+
+            if (selected === currentCorrectChar) {
+                scoreCorrect++;
+                feedbackBox.className = "quiz-feedback correct";
+                feedbackBox.innerText = "Doğru cevap!";
+                playFeedbackSound(true);
+            } else {
+                scoreWrong++;
+                feedbackBox.className = "quiz-feedback wrong";
+                feedbackBox.innerText = `Yanlış! Doğru cevap: ${currentCorrectChar}`;
+                playFeedbackSound(false);
+            }
+            
+            document.getElementById('quizScore').innerText = `Doğru: ${scoreCorrect} | Yanlış: ${scoreWrong}`;
+            
+            setTimeout(() => {
+                if (isQuizActive) nextQuizQuestion();
+            }, 1200);
+        }
+
+        function playFeedbackSound(isCorrect) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (isCorrect) {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(660, now + 0.1);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+            } else {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.setValueAtTime(150, now + 0.15);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                osc.start(now); osc.stop(now + 0.35);
+            }
+        }
+
+        function loadAlphabetGuide() {
+            const grid = document.getElementById('alphabetGrid');
+            morseData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'alphabet-item';
+                div.innerHTML = `
+                    <div class="char">${item.char}</div>
+                    <div class="morse">${item.morse}</div>
+                    <div class="mnemonic">${item.mnemonic}</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        loadAlphabetGuide();
+        updateSlide();
+        restartQuiz();
+    </script>
+</body>
+</html>
